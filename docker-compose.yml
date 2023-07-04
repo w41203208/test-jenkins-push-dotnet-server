@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  frontend:
+    container_name: frontend
+    image: ${DOCKER_REGISTRY-}${TempStage}wanintest
+    build:
+      context: .
+      dockerfile: Wanin_Test/Dockerfile
