@@ -3,35 +3,15 @@
     "Docker Compose": {
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
-      "composeLaunchAction": "LaunchBrowser",
+      //"composeLaunchAction": "LaunchBrowser",
       "composeLaunchServiceName": "frontend",
-      "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/swagger",
+      //"composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/swagger",
       "composeProfile": {
         "includes": []
       },
       "serviceActions": {
-        "frontend": "StartDebugging",
-        "redis": "StartWithoutDebugging"
-      }
-    },
-      "Start Redis": {
-        "commandName": "DockerCompose",
-        "commandVersion": "1.0",
-        "serviceActions": {
-          "frontend": "DoNotStart",
-          "redis": "StartWithoutDebugging"
-        }
-      },
-      "Start Other Services": {
-        "commandName": "DockerCompose",
-        "commandVersion": "1.0",
-        "composeLaunchAction": "LaunchBrowser",
-        "composeLaunchServiceName": "frontend",
-        "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/swagger",
-        "serviceActions": {
-          "frontend": "StartDebugging",
-          "redis": "DoNotStart"
-        }
+        "frontend": "StartDebugging"
       }
     }
+  }
 }

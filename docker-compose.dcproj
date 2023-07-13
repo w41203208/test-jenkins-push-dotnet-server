@@ -4,9 +4,11 @@
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
     <ProjectGuid>a95b5ab3-6a0c-4a52-a077-25a44a88b146</ProjectGuid>
-    <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
-    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
     <DockerServiceName>TEST</DockerServiceName>
+	<DockerComposeUpArguments>-d</DockerComposeUpArguments>
+	<!--<DockerfileFastModeStage>final</DockerfileFastModeStage>
+    <DockerDevelopmentMode>Fast</DockerDevelopmentMode>-->
+	<DockerDevelopmentMode>Regular</DockerDevelopmentMode>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">

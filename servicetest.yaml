@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: srs-service-test
+  name: tgs-service
+  labels:
+    app: tgs-service
+  annotations:
+    description: This service routes traffic to the my-test-service deployment.
+    author: Jay
+spec:
+  selector:
+    app: tgs-p-test
+  ports:
+    - name: service-for-tgs
+      protocol: TCP
+      port: 10501
+      targetPort: srs-gs-https
+      nodePort: 30002
+  type: NodePort

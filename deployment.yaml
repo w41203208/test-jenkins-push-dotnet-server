@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-game-service
+  namespace: srs-service
+  labels:
+    app: srs-service
+    environment: development
+    app.kubernetes.io/name: test-game-service
+  annotations:
+    description: This deployment is for my development environment.
+    author: Jay
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: srs-service #將與有相同標籤的 pod 相關聯
+  template:
+    metadata:
+      labels:
+        app: srs-service
+    spec:
+      nodeName: wanindev03
+      containers:
+        - name: test-game-service
+          image: docker.io/w41203208/test-game-service:v0.1.1 #asia.gcr.io/test-gcp-k8s-384206/my-test:v0.0.1
+          imagePullPolicy: Always
+          env:
+            - name: ASPNETCORE_URLS
+              value: "https://+:10501;http://+:10500"
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Production"
+          ports:
+            - name: 10500to10500
+              containerPort: 10500
+              protocol: TCP
+              hostPort: 10500
+            - name: 10501to10501
+              containerPort: 10501
+              protocol: TCP
+              hostPort: 10501
+          livenessProbe:
+            tcpSocket:
+              port: 10501
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 10501
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          # resources:
+          #   limits:
+          #     cpu: "1"
+          #     memory: "512Mi"
+          #   requests:
+          #     cpu: "500m"
+          #     memory: "256Mi"
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1 #設定同時只能有最多 1 個 pod 不能使用
+      maxSurge: 1 #指定了更新過程中可以暫時超出 replicas 數量的 Pod 數量
+  #     # 可以進一步設定更新策略的參數，例如：逐步更新的時間間隔等等。

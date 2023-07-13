@@ -1,9 +1,9 @@
-version: '3.4'
+version: '3.8'
 
 services:
   frontend:
-    container_name: frontend
-    image: ${DOCKER_REGISTRY-}${TempStage}wanintest
+    container_name: game-server
+    image: w41203208/test-game-service:test
     build:
       context: .
-      dockerfile: Wanin_Test/Dockerfile
+      dockerfile: GameTestServer/Dockerfile

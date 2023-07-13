@@ -4,10 +4,7 @@ services:
   frontend:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=https://+:10501;http://+:10500
     ports:
-      - "5000:80"
-      - "5001:443"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - "10500:10500"
+      - "10501:10501"
