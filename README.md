@@ -4,4 +4,4 @@
 - docker push w41203208/test-game-service:v0.1.1
 
 # Test
-this is test to use Visual Studio Git
+this is test to use Visual Studio Git 1
