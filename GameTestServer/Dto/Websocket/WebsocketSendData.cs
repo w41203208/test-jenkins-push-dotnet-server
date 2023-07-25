@@ -2,28 +2,30 @@
 
 namespace Wanin_Test.Dto.Websocket
 {
-    interface IWebsocketSendData
+    public abstract class AWebsocketData<T>
     {
-        public string ConvertToJson();
+        public T Data { get; set; }
+        public AWebsocketData(T data)
+        {
+            Data = data;
+        }
+        public abstract string ConvertToJson();
     }
-    public class WebsocketSendData<T>: IWebsocketSendData
+    public class WebsocketSendData<T>: AWebsocketData<T>
     {
         public string SendMethodType { get; set; }
 
-        public T Data { get; set; }
-
-        public WebsocketSendData(T data, string methodType)
+        public WebsocketSendData(T data, string methodType) : base(data)
         {
             SendMethodType = methodType;
-            Data = data;
         }
 
-        public string ConvertToJson()
+        public override string ConvertToJson()
         {
             string sendDataJson = JsonSerializerExteions.SerializeWithCamelCase(new
             {
                 Data,
-                MethodName = SendMethodType
+                MethodType = SendMethodType
             });
             return sendDataJson;
         }

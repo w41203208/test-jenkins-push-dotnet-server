@@ -1,66 +1,138 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System.Net.WebSockets;
 using System.Text;
 using Wanin_Test.Core.Share;
 using Wanin_Test.Services;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Wanin_Test.Controllers
 {
-    public class WebSocketControler : ControllerBase
+    public class WebSocketController : ControllerBase
     {
-        private readonly WebsocketManager _wManager;
+        private readonly WebSockerHandler _wHandler;
         private readonly SRSService _srsService;
         private readonly PublishListManager _pi;
+        private readonly int _receivePayloadBufferSize;
 
-        public WebSocketControler(WebsocketManager wm, SRSService ss, PublishListManager pi)
+
+
+        public WebSocketController(WebSockerHandler wh, SRSService ss, PublishListManager pi)
         {
             _srsService = ss;
-            _wManager = wm;
+            _wHandler = wh;
             _pi = pi;
+
+            _receivePayloadBufferSize = 1024;
         }
 
-        [HttpGet("")]
-        public async Task Get(string userId)
+        [HttpGet("/ws")]
+        public async Task Get([FromQuery]string userId)
         {
-            if (HttpContext.WebSockets.IsWebSocketRequest)
+            var currentWebSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+            try
             {
-                using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                _wManager.AddWebsocket(webSocket, userId);
-                await HandleReceive(webSocket, userId);
+                if (HttpContext.WebSockets.IsWebSocketRequest)
+                {
+                    bool addSuccess = _wHandler.AddWebsocket(currentWebSocket, userId);
+                    if (addSuccess)
+                    {
+                        await HandleReceive(currentWebSocket, userId);
+                        Console.WriteLine($"Is Closed {currentWebSocket.State}");
+                        Console.WriteLine($"---------------------------------------");
+                    }
+                    else
+                    {
+                        // When another websocket of same userId
+                        var oldWebsocket = _wHandler.GetWebsocket(userId);
+                        if (oldWebsocket != null)
+                        {
+                            // close old websocket
+                            if (oldWebsocket.State != WebSocketState.Closed)
+                            {
+                                //oldWebsocket.Dispose();
+                                Console.WriteLine("before");
+                                await oldWebsocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+                                Console.WriteLine("after");
+                            }
+
+                            // change websocket record data from old websocket to new websocket
+                            if (currentWebSocket.State == WebSocketState.Open)
+                            {
+                                bool add2Success = _wHandler.AddWebsocket(currentWebSocket, userId);
+                                // if updating fail will close current websocket connection.
+                                if (add2Success) 
+                                {
+                                    await HandleReceive(currentWebSocket, userId);
+                                    Console.WriteLine($"Is Closed {currentWebSocket.State}");
+                                    Console.WriteLine($"---------------------------------------");
+                                }
+                                else
+                                {
+                                    if (currentWebSocket.State != WebSocketState.Closed)
+                                    {
+                                        await currentWebSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+                                        _wHandler.RemoveWebsocket(userId);
+                                    }
+                                }
+                            }
+                        }
+                        
+                    }
+                }
+                else
+                {
+                    HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                Console.WriteLine("test2");
+                Console.WriteLine(ex.Message);
             }
         }
         private async Task HandleReceive(WebSocket webSocket, string id)
         {
-            var buffer = new byte[1024 * 4];
-            var res = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            
-            while (!res.CloseStatus.HasValue)
+            try
             {
-                var cmd = Encoding.UTF8.GetString(buffer, 0, res.Count);
-
-                // It doesnt handle receive data ( cmd )
-                res = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                WebSocketReceiveResult result;
+                byte[] receivePayloadBuffer = new byte[_receivePayloadBufferSize * 10];
+                
+                while (webSocket.State == WebSocketState.Open)
+                {
+                    result = await webSocket.ReceiveAsync(new ArraySegment<byte>(receivePayloadBuffer), CancellationToken.None);
+                    
+                    if (result.CloseStatus.HasValue)
+                    {
+                        Console.WriteLine(result.CloseStatus);
+                        Console.WriteLine(webSocket.State);
+                        if(webSocket.State == WebSocketState.Open || webSocket.State == WebSocketState.CloseReceived)
+                        {
+                            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+                            Console.WriteLine(webSocket.State);
+                        }
+                    }
+                    else
+                    {
+                        var cmd = Encoding.UTF8.GetString(receivePayloadBuffer, 0, result.Count);
+                    }
+                }
             }
-
-            await webSocket.CloseAsync(res.CloseStatus.Value, res.CloseStatusDescription, CancellationToken.None);
-            _wManager.RemoveWebsocket(id);
-
-            if (_pi.CheckPublisherHas(id)) {
-                // Delete stream url which srs server provide by id
-                _srsService.DeleteUrl(id);
-
-                // Delete local publishList record by id
-                _pi.RemovePublishList(id);
+            catch (Exception ex)
+            {
+                Console.WriteLine("Some SendData And Closed Error: ");
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _wHandler.RemoveWebsocket(id);
+                if (_pi.CheckPublisherHas(id))
+                {
+                    // Delete local publishList record by id
+                    _pi.RemovePublishList(id);
+                }
+                //webSocket.Dispose();
+                Console.WriteLine($"{id} close");
             }
             
-            Console.WriteLine($"{id} close");
         }
 
     }

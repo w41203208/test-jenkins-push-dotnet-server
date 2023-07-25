@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GameTestServer.Dto.SRSController;
+using Microsoft.AspNetCore.Mvc;
 using Wanin_Test.Core.Share;
 using Wanin_Test.Dto.SRSController;
 using Wanin_Test.Dto.Websocket;
@@ -11,14 +12,16 @@ namespace Wanin_Test.Controllers
     public class SRSController : ControllerBase
     {
         private readonly PublishListManager _pi;
-        private readonly WebsocketManager _wManager;
+        private readonly WebSockerHandler _wManager;
         private readonly SRSService _srsservice;
+        private readonly IConfiguration _conf;
 
-        public SRSController(PublishListManager pi, WebsocketManager wm, SRSService ss)
+        public SRSController(PublishListManager pi, WebSockerHandler wm, SRSService ss, IConfiguration conf)
         {
             _srsservice = ss;
             _pi = pi;
             _wManager = wm;
+            _conf = conf;
         }
 
         [HttpGet("test")]
@@ -93,7 +96,7 @@ namespace Wanin_Test.Controllers
         }
 
         [HttpPost("pull")]
-        public async Task<ActionResult<GetUrlResponse>> GetUrl(GetUrlPayload getUrlPayload)
+        public async Task<ActionResult<PullResponse>> GetUrl(GetUrlPayload getUrlPayload)
         {
             if (getUrlPayload.PullerId == null)
             {
@@ -117,7 +120,10 @@ namespace Wanin_Test.Controllers
                 });
             }
             var data = await _srsservice.GetUrl(getUrlPayload);
-            if(data == null)
+
+            var srsManagerConnection = "https://" + _conf["SRSHttpClientHost"] + ":" + _conf["SRSHttpClientPort"];
+
+            if (data == null)
             {
                 return NotFound(new
                 {
@@ -128,14 +134,18 @@ namespace Wanin_Test.Controllers
             {
                 if (data.PusherNeedToPush)
                 {
-                    var sendData = new WebsocketSendData<NotifyUrlData>(new NotifyUrlData { Url = data.Url, Token = "" }, "notify_url");
-                    _wManager.BroadCast(sendData);
+                    var sendData = new WebsocketSendData<NotifyUrlData>(new NotifyUrlData { RTCUrl = data.RTCUrl, RTMPUrl = data.RTMPUrl, SRSManagerConnectionUrl = srsManagerConnection, Token = "" }, "notify_url");
+                    _wManager.BroadCast(sendData, getUrlPayload.PullerId);
                 }
             }
 
-
-
-            return Ok(data);
+            return Ok(new PullResponse
+            {
+                RTCUrl = data.RTCUrl,
+                RTMPUrl = data.RTMPUrl,
+                SRSManagerConnectionUrl = srsManagerConnection,
+                Token = ""
+            });
         }
     }
 }

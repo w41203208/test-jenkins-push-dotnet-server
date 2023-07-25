@@ -1,6 +1,8 @@
-﻿namespace Wanin_Test.Dto.Websocket
+﻿using System.Text.Json.Serialization;
+
+namespace GameTestServer.Dto.SRSController
 {
-    public class NotifyUrlData
+    public class PullResponse
     {
         public string? RTCUrl { get; set; }
         public string? RTMPUrl { get; set; }

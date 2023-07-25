@@ -1,4 +1,3 @@
-using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using Wanin_Test.Core.Share;
@@ -16,7 +15,7 @@ builder.Services.AddSwaggerGen();
 
 // Add Custom Share Service
 builder.Services.AddSingleton<PublishListManager>();
-builder.Services.AddSingleton<WebsocketManager>();
+builder.Services.AddSingleton<WebSockerHandler>();
 builder.Services.AddSingleton<SRSService>();
 
 
@@ -27,8 +26,6 @@ static bool ValidateServerCertificate(object sender, X509Certificate? certificat
 
 
 string? test = builder.Configuration["isDebug"];
-Console.WriteLine($"IsDebug: {test}");
-
 string? httpClientNameForSRS = builder.Configuration["SRSHttpClientName"];
 string? httpClientPortForSRS = builder.Configuration["SRSHttpClientPort"];
 string? httpClientHostForSRS = builder.Configuration["SRSHttpClientHost"];

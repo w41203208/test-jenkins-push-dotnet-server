@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: test-game-service
-  namespace: srs-service
+  name: tgs-d-test
+  namespace: srs-service-test
   labels:
-    app: srs-service
+    app: tgs-d-test
     environment: development
-    app.kubernetes.io/name: test-game-service
+    app.kubernetes.io/name: tgs-d-test
   annotations:
     description: This deployment is for my development environment.
     author: Jay
@@ -14,16 +14,16 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: srs-service #將與有相同標籤的 pod 相關聯
+      app: tgs-p-test #將與有相同標籤的 pod 相關聯
+  # 設定給 pod 的資訊
   template:
     metadata:
       labels:
-        app: srs-service
+        app: tgs-p-test
     spec:
-      nodeName: wanindev03
       containers:
         - name: test-game-service
-          image: docker.io/w41203208/test-game-service:v0.1.1 #asia.gcr.io/test-gcp-k8s-384206/my-test:v0.0.1
+          image: docker.io/w41203208/test-game-service:v0.1.7
           imagePullPolicy: Always
           env:
             - name: ASPNETCORE_URLS
@@ -31,14 +31,12 @@ spec:
             - name: ASPNETCORE_ENVIRONMENT
               value: "Production"
           ports:
-            - name: 10500to10500
+            - name: srs-gs-http
               containerPort: 10500
               protocol: TCP
-              hostPort: 10500
-            - name: 10501to10501
+            - name: srs-gs-https
               containerPort: 10501
               protocol: TCP
-              hostPort: 10501
           livenessProbe:
             tcpSocket:
               port: 10501

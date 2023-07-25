@@ -6,12 +6,19 @@ namespace Wanin_Test.Dto.SRSController
     {
         [JsonPropertyName("userid")]
         public string? UserId { get; set; }
+
         [JsonPropertyName("pullerid")]
         public string? PullerId { get; set; }
+
         [JsonPropertyName("publisherid")]
         public string? PublisherId { get; set; }
-        [JsonPropertyName("url")]
-        public string? Url { get; set; }
+
+        [JsonPropertyName("rtmpurl")]
+        public string? RTMPUrl { get; set; }
+
+        [JsonPropertyName("rtcurl")]
+        public string? RTCUrl { get; set; }
+
         [JsonPropertyName("pusherneedtopush")]
         public bool PusherNeedToPush { get; set; }
     }

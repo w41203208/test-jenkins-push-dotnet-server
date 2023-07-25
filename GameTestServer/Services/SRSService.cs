@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GameTestServer.Dto.SRSController;
+using System;
+using System.Net.Http;
 using System.Text.Json;
 using Wanin_Test.Dto.SRSController;
 using Wanin_Test.Util;
@@ -19,7 +21,6 @@ namespace Wanin_Test.Services
         public async Task<GetUrlResponse?> GetUrl(GetUrlPayload data) { 
             try
             {
-
                 var res = await _httpClient.PostAsJsonAsync("api/get_url", data, new JsonSerializerOptions());
 
                 var content =  res.Content.ReadAsStringAsync().GetAwaiter().GetResult();
