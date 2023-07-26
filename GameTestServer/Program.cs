@@ -33,6 +33,11 @@ ArgumentNullException.ThrowIfNull(httpClientNameForSRS);
 
 
 // Enroll HttpClient by IHttpClientFactory
+// 1. directly enroll AddHttpClient() only, in enrolled service you need to create client and input entire Url
+// 2. give a name for httpClient registration, u can give some default data to it such as BaseAddress..., and then u need use name to search client in factory
+// 3. like my demo
+
+
 // can use Polly to send data again
 builder.Services.AddHttpClient<SRSService>(
     httpClientNameForSRS, 
@@ -67,7 +72,7 @@ builder.WebHost.UseKestrel(serverOptions =>
 {
     serverOptions.ListenAnyIP(10501, listenOptions =>
     {
-        listenOptions.UseHttps("../testcert.pfx",
+        listenOptions.UseHttps("./testcert.pfx",
                 "test");
     });
     serverOptions.ListenAnyIP(10500);

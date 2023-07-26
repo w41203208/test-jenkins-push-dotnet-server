@@ -27,9 +27,10 @@ namespace Wanin_Test.Controllers
         [HttpGet("/ws")]
         public async Task Get([FromQuery]string userId)
         {
-            var currentWebSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+            
             try
             {
+                var currentWebSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
                 if (HttpContext.WebSockets.IsWebSocketRequest)
                 {
                     bool addSuccess = _wHandler.AddWebsocket(currentWebSocket, userId);
@@ -48,18 +49,15 @@ namespace Wanin_Test.Controllers
                             // close old websocket
                             if (oldWebsocket.State != WebSocketState.Closed)
                             {
-                                //oldWebsocket.Dispose();
-                                Console.WriteLine("before");
                                 await oldWebsocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
-                                Console.WriteLine("after");
                             }
 
                             // change websocket record data from old websocket to new websocket
                             if (currentWebSocket.State == WebSocketState.Open)
                             {
-                                bool add2Success = _wHandler.AddWebsocket(currentWebSocket, userId);
+                                bool aupdate2Success = _wHandler.UpdateWebsocket(userId, currentWebSocket, oldWebsocket);
                                 // if updating fail will close current websocket connection.
-                                if (add2Success) 
+                                if (aupdate2Success)
                                 {
                                     await HandleReceive(currentWebSocket, userId);
                                     Console.WriteLine($"Is Closed {currentWebSocket.State}");
@@ -69,10 +67,26 @@ namespace Wanin_Test.Controllers
                                 {
                                     if (currentWebSocket.State != WebSocketState.Closed)
                                     {
-                                        await currentWebSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+                                        await currentWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
                                         _wHandler.RemoveWebsocket(userId);
                                     }
                                 }
+                                //bool add2Success = _wHandler.AddWebsocket(currentWebSocket, userId);
+                                //// if updating fail will close current websocket connection.
+                                //if (add2Success)
+                                //{
+                                //    await HandleReceive(currentWebSocket, userId);
+                                //    Console.WriteLine($"Is Closed {currentWebSocket.State}");
+                                //    Console.WriteLine($"---------------------------------------");
+                                //}
+                                //else
+                                //{
+                                //    if (currentWebSocket.State != WebSocketState.Closed)
+                                //    {
+                                //        await currentWebSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+                                //        _wHandler.RemoveWebsocket(userId);
+                                //    }
+                                //}
                             }
                         }
                         
@@ -85,7 +99,7 @@ namespace Wanin_Test.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("test2");
+                Console.WriteLine("Happened in Get");
                 Console.WriteLine(ex.Message);
             }
         }
@@ -104,10 +118,17 @@ namespace Wanin_Test.Controllers
                     {
                         Console.WriteLine(result.CloseStatus);
                         Console.WriteLine(webSocket.State);
-                        if(webSocket.State == WebSocketState.Open || webSocket.State == WebSocketState.CloseReceived)
+                        if(webSocket.State == WebSocketState.CloseReceived)
                         {
                             await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
                             Console.WriteLine(webSocket.State);
+                            _wHandler.RemoveWebsocket(id);
+                            if (_pi.CheckPublisherHas(id))
+                            {
+                                // Delete local publishList record by id
+                                _pi.RemovePublishList(id);
+                            }
+                            Console.WriteLine($"{id} close");
                         }
                     }
                     else
@@ -118,21 +139,9 @@ namespace Wanin_Test.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Some SendData And Closed Error: ");
+                Console.WriteLine("Happened in sending data and closed or closed receieved Error: ");
                 Console.WriteLine(ex.Message);
             }
-            finally
-            {
-                _wHandler.RemoveWebsocket(id);
-                if (_pi.CheckPublisherHas(id))
-                {
-                    // Delete local publishList record by id
-                    _pi.RemovePublishList(id);
-                }
-                //webSocket.Dispose();
-                Console.WriteLine($"{id} close");
-            }
-            
         }
 
     }

@@ -72,7 +72,7 @@ namespace Wanin_Test.Core.Share
                     if (websocket.Key != id)
                     {
                         Console.WriteLine(websocket.Value.State);
-                        if (websocket.Value.State == WebSocketState.Aborted || websocket.Value.State == WebSocketState.CloseReceived)
+                        if (websocket.Value.State != WebSocketState.Open)
                         {
                             websocket.Value.Dispose();
                             RemoveWebsocket(websocket.Key);

@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: test-game-service
-          image: docker.io/w41203208/test-game-service:v0.1.7
+          image: docker.io/w41203208/test-game-service:v0.1.8
           imagePullPolicy: Always
           env:
             - name: ASPNETCORE_URLS
