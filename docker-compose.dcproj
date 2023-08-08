@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" Sdk="Microsoft.Docker.Sdk">
-  <PropertyGroup Label="Globals">
-    <ProjectVersion>2.1</ProjectVersion>
-    <DockerTargetOS>Linux</DockerTargetOS>
-    <ProjectGuid>a95b5ab3-6a0c-4a52-a077-25a44a88b146</ProjectGuid>
-    <DockerServiceName>TEST</DockerServiceName>
-	<DockerComposeUpArguments>-d</DockerComposeUpArguments>
-	<!--<DockerfileFastModeStage>final</DockerfileFastModeStage>
-    <DockerDevelopmentMode>Fast</DockerDevelopmentMode>-->
-	<DockerDevelopmentMode>Regular</DockerDevelopmentMode>
-  </PropertyGroup>
-  <ItemGroup>
-    <None Include="docker-compose.override.yml">
-      <DependentUpon>docker-compose.yml</DependentUpon>
-    </None>
-    <None Include="docker-compose.yml" />
-    <None Include=".dockerignore" />
-  </ItemGroup>
+    <PropertyGroup Label="Globals">
+        <ProjectVersion>2.1</ProjectVersion>
+        <DockerTargetOS>Linux</DockerTargetOS>
+        <ProjectGuid>a95b5ab3-6a0c-4a52-a077-25a44a88b146</ProjectGuid>
+        <DockerServiceName>TEST</DockerServiceName>
+	    <DockerComposeUpArguments>-d</DockerComposeUpArguments>
+	    <!--<DockerfileFastModeStage>final</DockerfileFastModeStage>
+        <DockerDevelopmentMode>Fast</DockerDevelopmentMode>-->
+	    <DockerDevelopmentMode>Regular</DockerDevelopmentMode>
+    </PropertyGroup>
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<Exec Command="call GameTestServer/prebuild" />
+	</Target>
+	<!--<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<Exec Command="echo Configuration: $(Configuration)&#xD;&#xA;echo DevEnvDir: $(DevEnvDir)&#xD;&#xA;echo OutDir: $(OutDir)&#xD;&#xA;echo ProjectDir: $(ProjectDir)&#xD;&#xA;echo VisualStudioVersion: $(VisualStudioVersion)&#xD;&#xA;echo AssemblySearchPaths: $(AssemblySearchPaths)&#xD;&#xA;echo AssemblyName: $(AssemblyName)&#xD;&#xA;echo BaseIntermediateOutputPath: $(BaseIntermediateOutputPath)&#xD;&#xA;echo CscToolPath: $(CscToolPath)" />
+	</Target>-->
+    <ItemGroup>
+        <None Include="docker-compose.override.yml">
+            <DependentUpon>docker-compose.yml</DependentUpon>
+        </None>
+        <None Include="docker-compose.yml" />
+        <None Include=".dockerignore" />
+    </ItemGroup>
 </Project>

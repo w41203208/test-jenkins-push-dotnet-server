@@ -1,4 +1,9 @@
+using Microsoft.AspNetCore.Authentication.Certificate;
+using System;
+using System.Net;
 using System.Net.Security;
+using System.Runtime.ConstrainedExecution;
+using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using Wanin_Test.Core.Share;
 using Wanin_Test.Services;
@@ -19,17 +24,45 @@ builder.Services.AddSingleton<WebSockerHandler>();
 builder.Services.AddSingleton<SRSService>();
 
 
-static bool ValidateServerCertificate(object sender, X509Certificate? certificate, X509Chain? chain, SslPolicyErrors sslPolicyErrors)
-{
-    return true;
-}
+// 這個跟httpClientHandler真的有關
+builder.Services.AddAuthentication(CertificateAuthenticationDefaults.AuthenticationScheme).AddCertificate();
 
 
-string? test = builder.Configuration["isDebug"];
+string? is_deg = builder.Configuration["isDebug"];
+ArgumentNullException.ThrowIfNull(is_deg);
+Console.WriteLine($"DegMode: {is_deg}");
 string? httpClientNameForSRS = builder.Configuration["SRSHttpClientName"];
+ArgumentNullException.ThrowIfNull(httpClientNameForSRS);
 string? httpClientPortForSRS = builder.Configuration["SRSHttpClientPort"];
+ArgumentNullException.ThrowIfNull(httpClientPortForSRS);
 string? httpClientHostForSRS = builder.Configuration["SRSHttpClientHost"];
 ArgumentNullException.ThrowIfNull(httpClientNameForSRS);
+
+
+var clientCertFile = Path.Combine(builder.Environment.ContentRootPath, "testcert.pfx");
+var clientCertificate = new X509Certificate2(clientCertFile, "test", X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet);
+
+
+var serverCertFile = Path.Combine(builder.Environment.ContentRootPath, "cert.pem");
+var serverCertificate = new X509Certificate2(serverCertFile);
+clientCertificate.GetRawCertDataString();
+
+// this callback is used to verify server cert 
+bool ValidateServerCertificate(HttpRequestMessage requestMessage, X509Certificate2? certificate, X509Chain? chain, SslPolicyErrors sslPolicyErrors)
+{
+    if (sslPolicyErrors == SslPolicyErrors.None)
+        return true;
+
+    if (chain != null && chain.ChainElements.Count > 0)
+    {
+        X509Certificate2 root = chain.ChainElements[chain.ChainElements.Count - 1].Certificate;
+        if (root.RawData.SequenceEqual(serverCertificate.RawData))
+            return true;
+    }
+
+
+    return false;
+}
 
 
 // Enroll HttpClient by IHttpClientFactory
@@ -37,21 +70,30 @@ ArgumentNullException.ThrowIfNull(httpClientNameForSRS);
 // 2. give a name for httpClient registration, u can give some default data to it such as BaseAddress..., and then u need use name to search client in factory
 // 3. like my demo
 
-
 // can use Polly to send data again
 builder.Services.AddHttpClient<SRSService>(
     httpClientNameForSRS, 
     client =>
     {
-        client.BaseAddress = new Uri($"https://{httpClientHostForSRS}:{httpClientPortForSRS}");
+        string url;
+        url = $"https://{httpClientHostForSRS}:{httpClientPortForSRS}";
+        client.BaseAddress = new Uri(url);
         client.DefaultRequestHeaders.UserAgent.ParseAdd("Test-Game-Service#dotnet");
         
-    }).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    }).ConfigurePrimaryHttpMessageHandler(() => 
     {
-        ServerCertificateCustomValidationCallback = ValidateServerCertificate
+        HttpClientHandler handler;
+        handler = new HttpClientHandler
+        {
+            SslProtocols = SslProtocols.None,
+            ClientCertificateOptions = ClientCertificateOption.Manual,
+            // set how to verify server cert 
+            ServerCertificateCustomValidationCallback = ValidateServerCertificate
+        };
+        var clientCertificates = new X509Certificate2Collection { clientCertificate };
+        handler.ClientCertificates.AddRange(clientCertificates);
+        return handler;
     });
-
-
 
 // Enable CORS
 var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -63,7 +105,7 @@ builder.Services.AddCors(o =>
         Console.WriteLine($"CORS allowedhosts： {AllowedHosts}");
 
         policy.WithOrigins(AllowedHosts).AllowAnyMethod().AllowAnyHeader();
-    });
+    }); 
 });
 
 var HTTPS_PORT = builder.Configuration["SRS_HTTPS_PORT"];
@@ -78,19 +120,14 @@ builder.WebHost.UseKestrel(serverOptions =>
     serverOptions.ListenAnyIP(10500);
 });
 
-
-
-
 builder.Services.AddApplicationInsightsTelemetry();
-
-
-
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
+    Console.WriteLine("start swagger");
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -102,11 +139,9 @@ var webSocketOptions = new WebSocketOptions
 };
 
 app.UseWebSockets(webSocketOptions);
-
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
+app.UseAuthentication();
 app.UseCors(myAllowSpecificOrigins);
 
 // Add a middleware to display author's name at response headers.

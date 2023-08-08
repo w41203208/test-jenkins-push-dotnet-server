@@ -3,7 +3,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0.404 AS build
 WORKDIR /src
 COPY ["GameTestServer/GameTestServer.csproj", "GameTestServer/"]
 RUN dotnet restore "GameTestServer/GameTestServer.csproj"
@@ -17,5 +17,7 @@ RUN dotnet publish "GameTestServer.csproj" -c Release -o /app/publish /p:UseAppH
 FROM base AS final
 WORKDIR /app
 COPY ./testcert.pfx /app/testcert.pfx
+COPY ./cert.pem /app/cert.pem
+COPY ./openssl.cnf /etc/ssl/openssl.cnf
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "GameTestServer.dll"]
