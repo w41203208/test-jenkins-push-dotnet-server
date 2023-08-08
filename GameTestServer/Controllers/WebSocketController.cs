@@ -71,22 +71,6 @@ namespace Wanin_Test.Controllers
                                         _wHandler.RemoveWebsocket(userId);
                                     }
                                 }
-                                //bool add2Success = _wHandler.AddWebsocket(currentWebSocket, userId);
-                                //// if updating fail will close current websocket connection.
-                                //if (add2Success)
-                                //{
-                                //    await HandleReceive(currentWebSocket, userId);
-                                //    Console.WriteLine($"Is Closed {currentWebSocket.State}");
-                                //    Console.WriteLine($"---------------------------------------");
-                                //}
-                                //else
-                                //{
-                                //    if (currentWebSocket.State != WebSocketState.Closed)
-                                //    {
-                                //        await currentWebSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
-                                //        _wHandler.RemoveWebsocket(userId);
-                                //    }
-                                //}
                             }
                         }
                         

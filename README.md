@@ -14,4 +14,5 @@ this is test to use Visual Studio Git 1
 ### resolution
 
 - configure openssl.cnf?
-- add some setting value in httpclient?
+- To Research this package [builder.Services.AddAuthentication]
+
