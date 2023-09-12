@@ -27,7 +27,11 @@ namespace Wanin_Test.Controllers
         [HttpGet("/ws")]
         public async Task Get([FromQuery]string userId)
         {
-            
+            userId = userId.Trim();
+            if (userId == "" || userId == " ")
+            {
+                HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            }
             try
             {
                 var currentWebSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
@@ -37,8 +41,6 @@ namespace Wanin_Test.Controllers
                     if (addSuccess)
                     {
                         await HandleReceive(currentWebSocket, userId);
-                        Console.WriteLine($"Is Closed {currentWebSocket.State}");
-                        Console.WriteLine($"---------------------------------------");
                     }
                     else
                     {
@@ -60,8 +62,6 @@ namespace Wanin_Test.Controllers
                                 if (aupdate2Success)
                                 {
                                     await HandleReceive(currentWebSocket, userId);
-                                    Console.WriteLine($"Is Closed {currentWebSocket.State}");
-                                    Console.WriteLine($"---------------------------------------");
                                 }
                                 else
                                 {
@@ -91,6 +91,7 @@ namespace Wanin_Test.Controllers
         {
             try
             {
+                string userId = id;
                 WebSocketReceiveResult result;
                 byte[] receivePayloadBuffer = new byte[_receivePayloadBufferSize * 10];
                 
@@ -100,19 +101,19 @@ namespace Wanin_Test.Controllers
                     
                     if (result.CloseStatus.HasValue)
                     {
-                        Console.WriteLine(result.CloseStatus);
-                        Console.WriteLine(webSocket.State);
-                        if(webSocket.State == WebSocketState.CloseReceived)
+                        Console.WriteLine($"{userId}'s closeStatus: {result.CloseStatus}");
+                        Console.WriteLine($"{userId}'s webSocket.State: {webSocket.State}");
+                        if(webSocket.State == WebSocketState.CloseReceived || webSocket.State == WebSocketState.Aborted)
                         {
                             await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-                            Console.WriteLine(webSocket.State);
+                            Console.WriteLine($"{userId}'s webSocket.State after closing websocket object: {webSocket.State}");
                             _wHandler.RemoveWebsocket(id);
                             if (_pi.CheckPublisherHas(id))
                             {
                                 // Delete local publishList record by id
                                 _pi.RemovePublishList(id);
                             }
-                            Console.WriteLine($"{id} close");
+                            Console.WriteLine($"{userId} has already closed");
                         }
                     }
                     else

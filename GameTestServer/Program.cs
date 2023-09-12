@@ -1,8 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Certificate;
-using System;
-using System.Net;
 using System.Net.Security;
-using System.Runtime.ConstrainedExecution;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using Wanin_Test.Core.Share;
@@ -65,10 +62,6 @@ bool ValidateServerCertificate(HttpRequestMessage requestMessage, X509Certificat
 }
 
 
-// Enroll HttpClient by IHttpClientFactory
-// 1. directly enroll AddHttpClient() only, in enrolled service you need to create client and input entire Url
-// 2. give a name for httpClient registration, u can give some default data to it such as BaseAddress..., and then u need use name to search client in factory
-// 3. like my demo
 
 // can use Polly to send data again
 builder.Services.AddHttpClient<SRSService>(

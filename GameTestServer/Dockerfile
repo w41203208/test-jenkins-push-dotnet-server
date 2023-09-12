@@ -18,6 +18,6 @@ FROM base AS final
 WORKDIR /app
 COPY ./testcert.pfx /app/testcert.pfx
 COPY ./cert.pem /app/cert.pem
-COPY ./openssl.cnf /etc/ssl/openssl.cnf
+# COPY ./openssl.cnf /etc/ssl/openssl.cnf
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "GameTestServer.dll"]
