@@ -1,9 +1,13 @@
 # Deploy
 
-- docker build -t w41203208/test-game-service:v0.1.8 -f ./GameTestServer/Dockerfile .
-- docker push w41203208/test-game-service:v0.1.8
+- docker build -t w41203208/test-game-service:v0.3.0 -f ./GameTestServer/Dockerfile .
+- docker push w41203208/test-game-service:v0.3.1
 
-# Will Do
+## problem will happen when let httpclient use self-signed certificate
 
-- use grafana to show log
-- 
+- https://github.com/dotnet/runtime/issues/47117
+
+### resolution
+
+- configure openssl.cnf?
+- To Research this package [builder.Services.AddAuthentication]

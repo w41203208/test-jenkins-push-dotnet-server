@@ -112,13 +112,6 @@ namespace Wanin_Test.Controllers
                     Msg = "Dont't get your PublisherId. Please enter it."
                 });
             }
-            if (getUrlPayload.UserId == null)
-            {
-                return NotFound(new
-                {
-                    Msg = "Dont't get your UserId. Please enter it."
-                });
-            }
             var data = await _srsservice.GetUrl(getUrlPayload);
 
             var srsManagerConnection = "https://" + _conf["SRSHttpClientHost"] + ":" + _conf["SRSHttpClientPort"];
@@ -132,9 +125,9 @@ namespace Wanin_Test.Controllers
             }
             else
             {
-                if (data.PusherNeedToPush)
+                if (data.PublisherNeedToPush)
                 {
-                    var sendData = new WebsocketSendData<NotifyUrlData>(new NotifyUrlData { RTCUrl = data.RTCUrl, RTMPUrl = data.RTMPUrl, SRSManagerConnectionUrl = srsManagerConnection, Token = "" }, "notify_url");
+                    var sendData = new WebsocketSendData<NotifyUrlData>(new NotifyUrlData { RTCUrl = data.RTCUrl, RTMPUrl = data.RTMPUrl, SRSManagerConnectionUrl = srsManagerConnection, Token = data.Token }, "notify_url");
                     _wManager.BroadCast(sendData, getUrlPayload.PullerId);
                 }
             }
@@ -144,7 +137,7 @@ namespace Wanin_Test.Controllers
                 RTCUrl = data.RTCUrl,
                 RTMPUrl = data.RTMPUrl,
                 SRSManagerConnectionUrl = srsManagerConnection,
-                Token = ""
+                Token = data.Token,
             });
         }
     }

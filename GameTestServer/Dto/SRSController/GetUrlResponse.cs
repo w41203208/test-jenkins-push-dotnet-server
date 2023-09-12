@@ -4,9 +4,6 @@ namespace Wanin_Test.Dto.SRSController
 {
     public class GetUrlResponse
     {
-        [JsonPropertyName("userid")]
-        public string? UserId { get; set; }
-
         [JsonPropertyName("pullerid")]
         public string? PullerId { get; set; }
 
@@ -19,8 +16,11 @@ namespace Wanin_Test.Dto.SRSController
         [JsonPropertyName("rtcurl")]
         public string? RTCUrl { get; set; }
 
-        [JsonPropertyName("pusherneedtopush")]
-        public bool PusherNeedToPush { get; set; }
+        [JsonPropertyName("publisherneedtopush")]
+        public bool PublisherNeedToPush { get; set; }
+
+        [JsonPropertyName("token")]
+        public string? Token { get; set; }
     }
 
 }
