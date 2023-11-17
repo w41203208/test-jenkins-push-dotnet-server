@@ -11,7 +11,7 @@ pipeline {
   stages {
     stage('Prerequires') {
       steps {
-        sh ("docker --version")
+        sh ("systemctl status docker")
       }
     }
     stage('Build') {
