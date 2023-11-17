@@ -9,7 +9,7 @@ pipeline {
     stage('Build') {
       steps {
         echo "---------- Build docker image -----------"
-        sh ("sudo docker build -t ${IMAGE_NANE}:${IMAGE_VERSION} -f ${DOCKERFILE_PATH} .")
+        sh ("docker build -t ${IMAGE_NANE}:${IMAGE_VERSION} -f ${DOCKERFILE_PATH} .")
       }
     }
     stage('Push') {
