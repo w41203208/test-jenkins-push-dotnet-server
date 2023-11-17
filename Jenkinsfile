@@ -9,6 +9,23 @@ pipeline {
     dockerTool "Docker-default"
   }
   stages {
+    stage('Get Root User') {
+      steps {
+        script {
+          // Run the 'whoami' command to get the current user
+          def currentUser = sh(script: 'whoami', returnStdout: true).trim()
+          
+          echo "Current user: ${currentUser}"
+          
+          // Check if the current user is 'root'
+          if (currentUser == 'root') {
+              echo "Executing as root user"
+          } else {
+              echo "Not executing as root user"
+          }
+        }
+      }
+    }
     stage('Build') {
       steps {
         sh "${tool('Docker-default')}/bin/docker --version"
