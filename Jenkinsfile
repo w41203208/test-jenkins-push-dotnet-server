@@ -9,21 +9,16 @@ pipeline {
     dockerTool "Docker-default"
   }
   stages {
-    stage('Prerequires') {
-      steps {
-        sh ("systemctl status docker")
-      }
-    }
     stage('Build') {
       steps {
         echo "---------- Build docker image -----------"
-        sh ("docker build -t ${IMAGE_NANE}:${IMAGE_VERSION} -f ${DOCKERFILE_PATH} .")
+        docker build -t ${IMAGE_NANE}:${IMAGE_VERSION} -f ${DOCKERFILE_PATH} .
       }
     }
     stage('Push') {
       steps {
         echo "---------- Push docker image -----------"
-        sh ("docker push ${IMAGE_NANE}:${IMAGE_VERSION}")
+        docker push ${IMAGE_NANE}:${IMAGE_VERSION}
       }
     }
     stage('Deploy') {
