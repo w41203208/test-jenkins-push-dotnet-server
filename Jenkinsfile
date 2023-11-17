@@ -11,8 +11,9 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        ls -l /var/run/docker.sock
+        
         echo "---------- Build docker image -----------"
+        sh ("ls -l /var/run/docker.sock")
         sh ("docker build -t ${IMAGE_NANE}:${IMAGE_VERSION} -f ${DOCKERFILE_PATH} .")
       }
     }
