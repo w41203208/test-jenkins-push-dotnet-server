@@ -7,12 +7,16 @@ pipeline{
   }
   stages {
     stage('Build') {
-      echo "---------- Build docker image -----------"
-      sh ("sudo docker build -t ${IMAGE_NANE}:${IMAGE_VERSION} -f ${DOCKERFILE_PATH} .")
+      steps {
+        echo "---------- Build docker image -----------"
+        sh ("sudo docker build -t ${IMAGE_NANE}:${IMAGE_VERSION} -f ${DOCKERFILE_PATH} .")
+      }
     }
     stage('Push') {
-      echo "---------- Push docker image -----------"
-      sh ("docker push ${IMAGE_NANE}:${IMAGE_VERSION}")
+      steps {
+        echo "---------- Push docker image -----------"
+        sh ("docker push ${IMAGE_NANE}:${IMAGE_VERSION}")
+      }
     }
     stage('Deploy') {
       steps {
@@ -20,12 +24,12 @@ pipeline{
           echo "----------- BRANCH_TYPE=${BRANCH_TYPE} -----------"
           echo "Execute ${BRANCH_TYPE}"
         }
-        // sshPublisher(publishers: [sshPublisherDesc(configName: 'w41203208_wanin@webrtc', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: '''cd test/test-dotnet-server 
-        // sudo echo "${IMAGE_NANE}:${IMAGE_VERSION}"
-        // sudo export IMAGE_NAME=${IMAGE_NANE}:${IMAGE_VERSION}
-        // sudo sed -i 's/${DOCKER_IMAGE}/'"$IMAGE_NAME"'/g' ./docker-compose.pro.yml
-        // sudo docker compose -f docker-compose.pro.yml -f docker-compose.override.pro.yml up -d
-        // ''', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: 'test/test-dotnet-server', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '*.yml')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+        sshPublisher(publishers: [sshPublisherDesc(configName: 'w41203208_wanin@webrtc', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: '''cd test/test-dotnet-server 
+        sudo echo "${IMAGE_NANE}:${IMAGE_VERSION}"
+        sudo export IMAGE_NAME=${IMAGE_NANE}:${IMAGE_VERSION}
+        sudo sed -i 's/${DOCKER_IMAGE}/'"$IMAGE_NAME"'/g' ./docker-compose.pro.yml
+        sudo docker compose -f docker-compose.pro.yml -f docker-compose.override.pro.yml up -d
+        ''', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: 'test/test-dotnet-server', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '*.yml')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
     }
   }
 }
