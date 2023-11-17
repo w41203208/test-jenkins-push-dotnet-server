@@ -1,5 +1,5 @@
-pipeline{
-  agent { node { label "Main"}}
+pipeline {
+  agent { node { label "Main" } }
   environment { 
     IMAGE_NANE = 'w41203208/test-game-service'
     IMAGE_VERSION = 'v0.3.6'
@@ -30,6 +30,7 @@ pipeline{
         sudo sed -i 's/${DOCKER_IMAGE}/'"$IMAGE_NAME"'/g' ./docker-compose.pro.yml
         sudo docker compose -f docker-compose.pro.yml -f docker-compose.override.pro.yml up -d
         ''', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: 'test/test-dotnet-server', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '*.yml')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+      }
     }
   }
 }
