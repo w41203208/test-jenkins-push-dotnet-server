@@ -6,7 +6,8 @@ pipeline {
     DOCKERFILE_PATH = './GameTestServer/Dockerfile'
   }
   tools {
-    docker "docker-default"
+    // nodejs "NodeJS-21.2.0"
+    docker "Docker-default"
   }
   stages {
     stage('Build') {
