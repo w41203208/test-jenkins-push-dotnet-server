@@ -6,5 +6,5 @@ services:
       - ASPNETCORE_ENVIRONMENT=Product
       - ASPNETCORE_URLS=https://+:10501;http://+:10500
     ports:
-      - "10500:10500"
-      - "10501:10501"
+      - "65003:10500"
+      - "65004:10501"
