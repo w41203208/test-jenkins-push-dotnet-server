@@ -12,6 +12,7 @@ pipeline {
     stage('Build') {
       steps {
         sh "${tool('Docker-default')}/bin/docker --version"
+        sh "usermod -aG docker"
         echo "---------- Build docker image -----------"
         sh ("${tool('Docker-default')}/bin/docker build -t ${IMAGE_NANE}:${IMAGE_VERSION} -f ${DOCKERFILE_PATH} .")
       }
