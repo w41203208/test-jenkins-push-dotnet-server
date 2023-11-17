@@ -55,13 +55,46 @@ namespace Wanin_Test.Core.Share
             }
         }
 
+        public void Send<T>(WebsocketSendData<T> sendData, string id)
+        {
+            var json = sendData.ConvertToJson();
+            ArraySegment<byte> buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(json));
+            Send(buffer, id);
+        }
+
+        public void Send(ArraySegment<byte> buffer, string id)
+        {
+            try
+            {
+                WebSocket? w;
+                if (_webscokets.TryGetValue(id, out w))
+                {
+                    if (w.State != WebSocketState.Open)
+                    {
+                        w.Dispose();
+                        RemoveWebsocket(id);
+                    }
+                    else
+                    {
+                        if (!w.CloseStatus.HasValue)
+                        {
+                            w.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None); ;
+                        }
+                    }
+                   
+                }
+            }catch (Exception ex) 
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
         public void BroadCast<T>(WebsocketSendData<T> sendData, string? excludeUserId = null)
         {
             var json = sendData.ConvertToJson();
             ArraySegment<byte> buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(json));
             BroadCast(buffer, excludeUserId);
-            
-        }
+       }
 
         private void BroadCast(ArraySegment<byte> buffer, string? id)
         { 
@@ -71,7 +104,7 @@ namespace Wanin_Test.Core.Share
                 {
                     if (websocket.Key != id)
                     {
-                        Console.WriteLine($"{websocket.Key}: ", websocket.Value.State);
+                        Console.WriteLine($"{websocket.Key}: {websocket.Value.State}");
                         if (websocket.Value.State != WebSocketState.Open)
                         {
                             websocket.Value.Dispose();

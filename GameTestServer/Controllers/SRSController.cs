@@ -35,7 +35,7 @@ namespace Wanin_Test.Controllers
         public ActionResult<CanPublishResponse> CanPublish(CanPublishPayload canPublishPayload)
         {
             string? userId = canPublishPayload.UserId;
-            if (userId == null)
+            if (userId == "")
             {
                 return BadRequest(new CanPublishResponse
                 {
@@ -63,7 +63,7 @@ namespace Wanin_Test.Controllers
         public ActionResult<CancelCanPublishResponse> CancelCanPublish(CancelCanPublishPayload cancelCanPublishPayload)
         {
             string? userId = cancelCanPublishPayload.UserId;
-            if (userId == null)
+            if (userId == "")
             {
                 return BadRequest(new CancelCanPublishResponse
                 {
@@ -128,7 +128,7 @@ namespace Wanin_Test.Controllers
                 if (data.PublisherNeedToPush)
                 {
                     var sendData = new WebsocketSendData<NotifyUrlData>(new NotifyUrlData { RTCUrl = data.RTCUrl, RTMPUrl = data.RTMPUrl, SRSManagerConnectionUrl = srsManagerConnection, Token = data.Token }, "notify_url");
-                    _wManager.BroadCast(sendData, getUrlPayload.PullerId);
+                    _wManager.Send(sendData, getUrlPayload.PublisherId);
                 }
             }
 

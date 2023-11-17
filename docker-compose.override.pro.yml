@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  frontend:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Product
+      - ASPNETCORE_URLS=https://+:10501;http://+:10500
+    ports:
+      - "10500:10500"
+      - "10501:10501"

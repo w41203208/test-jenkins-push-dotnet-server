@@ -1,7 +1,7 @@
 # Deploy
 
-- docker build -t w41203208/test-game-service:v0.3.0 -f ./GameTestServer/Dockerfile .
-- docker push w41203208/test-game-service:v0.3.1
+- docker build -t w41203208/test-game-service:v0.3.5 -f ./GameTestServer/Dockerfile .
+- docker push w41203208/test-game-service:v0.3.5
 
 ## problem will happen when let httpclient use self-signed certificate
 

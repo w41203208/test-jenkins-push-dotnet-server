@@ -3,6 +3,7 @@ using System;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using Wanin_Test.Core.Share;
 using Wanin_Test.Dto.SRSController;
 using Wanin_Test.Util;
 
@@ -10,11 +11,13 @@ namespace Wanin_Test.Services
 {
     public class SRSService
     {
+        private readonly WebSockerHandler _wHandler;
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _conf;
 
-        public SRSService(HttpClient httpClient, IConfiguration conf)
+        public SRSService(WebSockerHandler wh, HttpClient httpClient, IConfiguration conf)
         {
+            _wHandler = wh;
             _httpClient = httpClient;
             _conf = conf;
         }
