@@ -4,7 +4,6 @@ pipeline{
     IMAGE_NANE = 'w41203208/test-game-service'
     IMAGE_VERSION = 'v0.3.6'
     DOCKERFILE_PATH = './GameTestServer/Dockerfile'
-    //TEST
   }
   stages {
     stage('Build') {
