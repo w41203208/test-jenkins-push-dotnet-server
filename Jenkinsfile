@@ -7,7 +7,7 @@ pipeline {
   }
   tools {
     nodejs "NodeJS-21.2.0"
-    docker "Docker-default"
+    dockerTool "Docker-default"
   }
   stages {
     stage('Build') {
