@@ -11,14 +11,15 @@ pipeline {
   stages {
     stage('Build') {
       steps {
+        ls -l /var/run/docker.sock
         echo "---------- Build docker image -----------"
-        docker build -t ${IMAGE_NANE}:${IMAGE_VERSION} -f ${DOCKERFILE_PATH} .
+        sh ("docker build -t ${IMAGE_NANE}:${IMAGE_VERSION} -f ${DOCKERFILE_PATH} .")
       }
     }
     stage('Push') {
       steps {
         echo "---------- Push docker image -----------"
-        docker push ${IMAGE_NANE}:${IMAGE_VERSION}
+        sh ("docker push ${IMAGE_NANE}:${IMAGE_VERSION}")
       }
     }
     stage('Deploy') {
