@@ -11,7 +11,7 @@ pipeline {
   stages {
     stage('Prerequires') {
       steps {
-        sh ("sudo systemctl start docker")
+        sh ("docker --version")
       }
     }
     stage('Build') {
