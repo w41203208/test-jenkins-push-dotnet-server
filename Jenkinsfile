@@ -6,10 +6,14 @@ pipeline {
     DOCKERFILE_PATH = './GameTestServer/Dockerfile'
   }
   tools {
-    nodejs "NodeJS-21.2.0"
     dockerTool "Docker-default"
   }
   stages {
+    stage('Prerequires') {
+      steps {
+        sh ("sudo systemctl start docker")
+      }
+    }
     stage('Build') {
       steps {
         echo "---------- Build docker image -----------"
