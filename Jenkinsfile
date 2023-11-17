@@ -8,11 +8,11 @@ pipeline{
   stages {
     stage('Build') {
       echo "---------- Build docker image -----------"
-      sudo docker build -t ${IMAGE_NANE}:${IMAGE_VERSION} -f ${DOCKERFILE_PATH} .
+      sh ("sudo docker build -t ${IMAGE_NANE}:${IMAGE_VERSION} -f ${DOCKERFILE_PATH} .")
     }
     stage('Push') {
       echo "---------- Push docker image -----------"
-      docker push ${IMAGE_NANE}:${IMAGE_VERSION}
+      sh ("docker push ${IMAGE_NANE}:${IMAGE_VERSION}")
     }
     stage('Deploy') {
       steps {
