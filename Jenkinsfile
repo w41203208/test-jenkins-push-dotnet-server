@@ -11,7 +11,7 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        
+        sh "${tool('Docker-default')}/bin/docker --version"
         echo "---------- Build docker image -----------"
         sh ("docker build -t ${IMAGE_NANE}:${IMAGE_VERSION} -f ${DOCKERFILE_PATH} .")
       }
