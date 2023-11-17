@@ -11,15 +11,16 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        sh "${tool('Docker-default')}/bin/docker --version"
+        sh "docker --version"
+        sh "docker"
         echo "---------- Build docker image -----------"
-        sh "${tool('Docker-default')}/bin/docker build -t ${IMAGE_NANE}:${IMAGE_VERSION} -f ${DOCKERFILE_PATH} ."
+        sh "docker build -t ${IMAGE_NANE}:${IMAGE_VERSION} -f ${DOCKERFILE_PATH} ."
       }
     }
     stage('Push') {
       steps {
         echo "---------- Push docker image -----------"
-        sh ("${tool('Docker-default')}/bin/docker push ${IMAGE_NANE}:${IMAGE_VERSION}")
+        sh ("docker push ${IMAGE_NANE}:${IMAGE_VERSION}")
       }
     }
     stage('Deploy') {
