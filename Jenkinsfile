@@ -12,7 +12,7 @@ pipeline {
     stage('Build') {
       steps {
         sh "docker --version"
-        sh "dockerd"
+        sh "ls /var/run"
         echo "---------- Build docker image -----------"
         sh "docker build -t ${IMAGE_NANE}:${IMAGE_VERSION} -f ${DOCKERFILE_PATH} ."
       }
